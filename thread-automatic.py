@@ -10,20 +10,32 @@ import time
 start = time.perf_counter()
 
 SLEEP_TIME = 1  # seconds
+DYNAMIC_SLEEP_TIME = [5, 4, 3, 2, 1]  # seconds
 THREADS = 10  # number of threads to create
 
 
 def do_something(seconds):
     print(f"Sleeping {seconds} second(s)...")
     time.sleep(seconds)
-    return "Done sleeping..."
+    return f"Done sleeping...{seconds} second(s)"
 
 
 with concurrent.futures.ThreadPoolExecutor() as executor:
     # f1 = executor.submit(do_something, SLEEP_TIME)  # schedules function to be executed and returns a future object (to check results, running)
     # print(f1.result())  # blocks until the function is done executing, returns the result of the function
 
-    results = [executor.submit(do_something, SLEEP_TIME) for _ in range(THREADS)]
+    # dynamic sleeps for testing, different sleep times
+    # submit approach
+    # results = [executor.submit(do_something, sec) for sec in DYNAMIC_SLEEP_TIME]
+
+    # map approach
+    results = executor.map(do_something, DYNAMIC_SLEEP_TIME)  # returns an iterator of results
+
+    for result in results:
+        print(result)
+
+    # for fixed sleep times
+    # results = [executor.submit(do_something, SLEEP_TIME) for _ in range(THREADS)]
 
     # get results
     for f in concurrent.futures.as_completed(results):
